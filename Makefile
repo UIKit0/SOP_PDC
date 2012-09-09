@@ -23,7 +23,7 @@
 SHELL=/bin/csh
 
 # VERSION=${HOUDINI_VERSION}
-SRC_VER = 1.5.3
+SRC_VER = 2.0.0
 SHELL=/bin/csh
 
 pdc_src = dump_PDC.C  Maya_PDC_File.C  endian.h  Maya_PDC_File.h  
@@ -62,7 +62,7 @@ SOP_PDC_Export: ${pdc_src} $(export_src)
 
 archive_src:
 	rm -fr html/
-	doxygen Doxy_config.txt
+	doxygen Doxyconfig
 	tar zcf Houdini_PDC_src_v${SRC_VER}.tar.gz \
 	Doxy_config.txt \
 	Makefile \
@@ -72,10 +72,10 @@ archive_src:
 
 release: 
 	rm -fr html/
-	doxygen Doxy_config.txt
+	doxygen Doxyconfig
 	rm -fr SOP_PDC_v${SRC_VER}
 	mkdir SOP_PDC_v${SRC_VER}
-	cp -r ${src} Doxy_config.txt Makefile html/ SOP_PDC_v${SRC_VER}/
+	cp -r ${src} Doxyconfig Makefile html/ SOP_PDC_v${SRC_VER}/
 	cd SOP_PDC_v${SRC_VER}; \
 	   tar zcf Houdini_PDC_src_v${SRC_VER}.tar.gz *
 	cp -r distro/ SOP_PDC_v${SRC_VER}/

@@ -2,13 +2,13 @@
 *  Maya PDC Geometry Export SOP Houdini Extension
 *
 *
-* $Revision: 1.16 $
+* $Revision: 1.17 $
 * $Source: /dca/cvsroot/houdini/SOP_PDC/SOP_PDC_Export.C,v $
 * $Author: mstory $
-* $Date: 2012-06-13 14:48:30 $
-* $Header: /dca/cvsroot/houdini/SOP_PDC/SOP_PDC_Export.C,v 1.16 2012-06-13 14:48:30 mstory Exp $
+* $Date: 2012-09-03 16:56:04 $
+* $Header: /dca/cvsroot/houdini/SOP_PDC/SOP_PDC_Export.C,v 1.17 2012-09-03 16:56:04 mstory Exp $
 * $State: Exp $
-* $Id: SOP_PDC_Export.C,v 1.16 2012-06-13 14:48:30 mstory Exp $
+* $Id: SOP_PDC_Export.C,v 1.17 2012-09-03 16:56:04 mstory Exp $
 * $Locker:  $
 *
 *  Version 1.5.3
@@ -52,12 +52,12 @@
 #include <UT/UT_Version.h>
 
 #if UT_MAJOR_VERSION_INT >= 12
-  #include <GA/GA_AttributeRef.h>
+#include <GA/GA_AttributeRef.h>
 #else
-  #include <GB/GB_AttributeDict.h>
-  #if UT_MAJOR_VERSION_INT >= 10
-    #include <GB/GB_AttributeRef.h>
-  #endif
+#include <GB/GB_AttributeDict.h>
+#if UT_MAJOR_VERSION_INT >= 10
+#include <GB/GB_AttributeRef.h>
+#endif
 #endif
 
 
@@ -80,7 +80,8 @@
 *  Return Value :
 *
 ***************************************************************************** */
-SOP_PDC_Export_Exception::SOP_PDC_Export_Exception(enumErrorList code, enumExceptionSeverity sev) {
+SOP_PDC_Export_Exception::SOP_PDC_Export_Exception(enumErrorList code, enumExceptionSeverity sev)
+{
 
 //   cout << "SOP_PDC_Export_Exception: in constructor ... " << endl;
 
@@ -93,11 +94,11 @@ SOP_PDC_Export_Exception::SOP_PDC_Export_Exception(enumErrorList code, enumExcep
 
 
 
- //SOP_PDC_Export_Exception::~SOP_PDC_Export_Exception() {
+//SOP_PDC_Export_Exception::~SOP_PDC_Export_Exception() {
 
- //   cout << "SOP_PDC_Export_Exception: in destructor ... " << endl;
+//   cout << "SOP_PDC_Export_Exception: in destructor ... " << endl;
 
- //   };
+//   };
 
 
 
@@ -113,13 +114,13 @@ SOP_PDC_Export_Exception::SOP_PDC_Export_Exception(enumErrorList code, enumExcep
 *
 ***************************************************************************** */
 OP_PDC_Export_Operator::OP_PDC_Export_Operator()
-    : OP_Operator("PDC_export",
-         "Maya PDC Export",
-         SOP_PDC_Export::myConstructor,
-         SOP_PDC_Export::myTemplateList,
-         1,
-         1,
-         0)
+      : OP_Operator("PDC_export",
+                    "Maya PDC Export",
+                    SOP_PDC_Export::myConstructor,
+                    SOP_PDC_Export::myTemplateList,
+                    1,
+                    1,
+                    0)
 {
 }
 
@@ -152,21 +153,21 @@ OP_PDC_Export_Operator::~OP_PDC_Export_Operator()
 
 bool OP_PDC_Export_Operator::getHDKHelp(UT_String &help) const
 {
-  help  = "<html><body>";
+   help  = "<html><body>";
 
-    help  = "<h3>Maya PDC Geometry Export SOP</h3>";
+   help  = "<h3>Maya PDC Geometry Export SOP</h3>";
 
-    help += "<br>";
+   help += "<br>";
 
 
-  help += "</body></html>";
+   help += "</body></html>";
 
-  // Note: HDK developers are discouraged from embedding help
-  // in their C files and should use external help when possible.
+   // Note: HDK developers are discouraged from embedding help
+   // in their C files and should use external help when possible.
 
-  // The getHDKHelp() must return true if it is to be used in place of
-  // other forms of help (eg. custom, OTL, or Houdini help).
-  return true;
+   // The getHDKHelp() must return true if it is to be used in place of
+   // other forms of help (eg. custom, OTL, or Houdini help).
+   return true;
 }
 
 
@@ -183,7 +184,7 @@ bool OP_PDC_Export_Operator::getHDKHelp(UT_String &help) const
 ***************************************************************************** */
 void newSopOperator(OP_OperatorTable *table)
 {
-     table->addOperator(new OP_PDC_Export_Operator());
+   table->addOperator(new OP_PDC_Export_Operator());
 }
 
 
@@ -198,18 +199,18 @@ void newSopOperator(OP_OperatorTable *table)
 #define NPARMS_FOLDER_1 3
 
 static PRM_Default  switcherDef[] = {
-    PRM_Default(NPARMS_FOLDER_1,    "Setup"),
+   PRM_Default(NPARMS_FOLDER_1,    "Setup"),
 };
 
 
 static PRM_Name        		names[] = {
-	// Setup parameters
+   // Setup parameters
    PRM_Name("file_name",	"File Name"),
    PRM_Name("start_end",	"Start/End"),
    PRM_Name("attrs",	         "Attributes"),
    PRM_Name("write_file",  "Write PDC File"),
 
-    PRM_Name(0)
+   PRM_Name(0)
 };
 
 // Defaults
@@ -236,7 +237,7 @@ PRM_Template SOP_PDC_Export::myTemplateList[] = {
    // Filename of the file to be exported
    PRM_Template(PRM_FILE, 1, &names[0], &nameDefault_filename, 0, 0, 0, 0, 1, "The Filename of the PDC file to import"),
    // Animation Range
-    PRM_Template(PRM_BEGINEND_J,2, &names[1], PRMoneDefaults, 0, &animRange),
+   PRM_Template(PRM_BEGINEND_J,2, &names[1], PRMoneDefaults, 0, &animRange),
    // Attributes to export
    PRM_Template(PRM_STRING, 1, &names[2]),
 
@@ -260,7 +261,7 @@ PRM_Template SOP_PDC_Export::myTemplateList[] = {
 ***************************************************************************** */
 OP_Node * SOP_PDC_Export::myConstructor(OP_Network *net, const char *name, OP_Operator *op)
 {
-    return new SOP_PDC_Export(net, name, op);
+   return new SOP_PDC_Export(net, name, op);
 }
 
 
@@ -275,7 +276,7 @@ OP_Node * SOP_PDC_Export::myConstructor(OP_Network *net, const char *name, OP_Op
 *
 ***************************************************************************** */
 SOP_PDC_Export::SOP_PDC_Export(OP_Network *net, const char *name, OP_Operator *op)
-	: SOP_Node(net, name, op)
+      : SOP_Node(net, name, op)
 {
    // Initialize this object
    myParmBase = getParmList()->getParmIndex( names[0].getToken() );
@@ -283,10 +284,10 @@ SOP_PDC_Export::SOP_PDC_Export(OP_Network *net, const char *name, OP_Operator *o
 
    myCallBackFlags = (enumErrorList)0;
 
-   #ifdef SOP_MAJOR_VER
+#ifdef SOP_MAJOR_VER
    mySOPVersion = SOP_MAJOR_VER +  "." + SOP_MINOR_VER;
 //   std::cout << "Version: " << SOP_MAJOR_VER << "." << SOP_MINOR_VER << std::endl;
-   #endif
+#endif
 
    errorMsgsPDCExport[endFrameMustBeGreaterThanBeginningFrame] = "End frame must be greater than beginning frame!";
    errorMsgsPDCExport[canNotOpenPDCFileForWriting] = "Can't open Maya PDC file for writing";
@@ -299,7 +300,7 @@ SOP_PDC_Export::SOP_PDC_Export(OP_Network *net, const char *name, OP_Operator *o
 
    myPDCFile = new dca::Maya_PDC_File(0,0);
 
-	disableParms();
+   disableParms();
 
 //    mySopFlags.setNeedGuide1(1);
 }
@@ -316,8 +317,9 @@ SOP_PDC_Export::SOP_PDC_Export(OP_Network *net, const char *name, OP_Operator *o
 *
 ***************************************************************************** */
 // Destructor
-SOP_PDC_Export::~SOP_PDC_Export() {
-	delete(myPDCFile);
+SOP_PDC_Export::~SOP_PDC_Export()
+{
+   delete(myPDCFile);
 }
 
 
@@ -334,10 +336,11 @@ SOP_PDC_Export::~SOP_PDC_Export() {
 *
 ***************************************************************************** */
 int SOP_PDC_Export::writeTheFile(void *data, int index,
-		float time, const PRM_Template *tplate ) {
+                                 float time, const PRM_Template *tplate )
+{
 
 #ifdef DEBUG
-		cout << "writeTheFile() - Writing the Maya PDC File" << endl;
+   cout << "writeTheFile() - Writing the Maya PDC File" << endl;
 #endif
 
    // Set the callback flag true and reset the error flag as well
@@ -371,17 +374,17 @@ int SOP_PDC_Export::writeTheFile(void *data, int index,
 ***************************************************************************** */
 unsigned SOP_PDC_Export::disableParms()
 {
-    unsigned changed = 0;
+   unsigned changed = 0;
 
-	// First turn them all on
-	for(int i=0; i <= NUM_GUI_PARMS; i++)
-		enableParm(i, 1);
+   // First turn them all on
+   for (int i=0; i <= NUM_GUI_PARMS; i++)
+      enableParm(i, 1);
 
 #ifdef DEBUG
-cout << "disableParms()-changed: " << changed << endl;
+   cout << "disableParms()-changed: " << changed << endl;
 #endif
 
-      return changed;
+   return changed;
 }
 
 
@@ -412,8 +415,8 @@ OP_ERROR SOP_PDC_Export::cookMySop(OP_Context &context)
 
 
 #ifdef DEBUG
-std::cout << "SOP_PDC_Export::cookMySop()" << std::endl;
-std::cout << "SOP_PDC_Export::cookMySop() - myAttrs: " << myAttrs << std::endl;
+   std::cout << "SOP_PDC_Export::cookMySop()" << std::endl;
+   std::cout << "SOP_PDC_Export::cookMySop() - myAttrs: " << myAttrs << std::endl;
 #endif
 
    writePDCFile(context);
@@ -435,13 +438,16 @@ std::cout << "SOP_PDC_Export::cookMySop() - myAttrs: " << myAttrs << std::endl;
 ***************************************************************************** */
 const char * SOP_PDC_Export::inputLabel(unsigned) const
 {
-    return "Geometry to Export to Maya";
+   return "Geometry to Export to Maya";
 }
 
 
 
 /**********************************************************************************/
 //  $Log: SOP_PDC_Export.C,v $
+//  Revision 1.17  2012-09-03 16:56:04  mstory
+//  .
+//
 //  Revision 1.16  2012-06-13 14:48:30  mstory
 //  Added H12 mods from Frederic Servant.
 //

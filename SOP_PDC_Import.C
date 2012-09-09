@@ -1,13 +1,13 @@
 /* ******************************************************************************
 *  Maya PDC Particle Geometry Import SOP Houdini Extension
 *
-* $Revision: 1.16 $
+* $Revision: 1.17 $
 * $Source: /dca/cvsroot/houdini/SOP_PDC/SOP_PDC_Import.C,v $
 * $Author: mstory $
-* $Date: 2012-06-13 23:17:02 $
-* $Header: /dca/cvsroot/houdini/SOP_PDC/SOP_PDC_Import.C,v 1.16 2012-06-13 23:17:02 mstory Exp $
+* $Date: 2012-09-03 16:56:04 $
+* $Header: /dca/cvsroot/houdini/SOP_PDC/SOP_PDC_Import.C,v 1.17 2012-09-03 16:56:04 mstory Exp $
 * $State: Exp $
-* $Id: SOP_PDC_Import.C,v 1.16 2012-06-13 23:17:02 mstory Exp $
+* $Id: SOP_PDC_Import.C,v 1.17 2012-09-03 16:56:04 mstory Exp $
 * $Locker:  $
 *
 *  Version 1.5.3
@@ -50,12 +50,12 @@
 #include <CH/CH_LocalVariable.h>
 
 #if UT_MAJOR_VERSION_INT >= 12
-  #include <GA/GA_AttributeRef.h>
+#include <GA/GA_AttributeRef.h>
 #else
-  #include <GB/GB_AttributeDict.h>
-  #if UT_MAJOR_VERSION_INT >= 10
-    #include <GB/GB_AttributeRef.h>
-  #endif
+#include <GB/GB_AttributeDict.h>
+#if UT_MAJOR_VERSION_INT >= 10
+#include <GB/GB_AttributeRef.h>
+#endif
 #endif
 
 
@@ -77,7 +77,8 @@
 *  Return Value :
 *
 ***************************************************************************** */
-SOP_PDC_Import_Exception::SOP_PDC_Import_Exception(enumErrorList code, enumExceptionSeverity sev) {
+SOP_PDC_Import_Exception::SOP_PDC_Import_Exception(enumErrorList code, enumExceptionSeverity sev)
+{
 
 //   cout << "SOP_PDC_Import_Exception: in constructor ... " << endl;
 
@@ -90,11 +91,11 @@ SOP_PDC_Import_Exception::SOP_PDC_Import_Exception(enumErrorList code, enumExcep
 
 
 
- //SOP_PDC_Import_Exception::~SOP_PDC_Import_Exception() {
+//SOP_PDC_Import_Exception::~SOP_PDC_Import_Exception() {
 
- //   cout << "SOP_PDC_Import_Exception: in destructor ... " << endl;
+//   cout << "SOP_PDC_Import_Exception: in destructor ... " << endl;
 
- //   };
+//   };
 
 
 /* ******************************************************************************
@@ -108,14 +109,14 @@ SOP_PDC_Import_Exception::SOP_PDC_Import_Exception(enumErrorList code, enumExcep
 *
 ***************************************************************************** */
 OP_PDC_Import_Operator::OP_PDC_Import_Operator()
-    : OP_Operator("PDC_import",
-		  "Maya PDC Import",
-		  SOP_PDC_Import::myConstructor,
-		  SOP_PDC_Import::myTemplateList,
-		  0,
-		  0,
-		  SOP_PDC_Import::myVariables,
-		  OP_FLAG_GENERATOR)
+      : OP_Operator("PDC_import",
+                    "Maya PDC Import",
+                    SOP_PDC_Import::myConstructor,
+                    SOP_PDC_Import::myTemplateList,
+                    0,
+                    0,
+                    SOP_PDC_Import::myVariables,
+                    OP_FLAG_GENERATOR)
 {
 }
 
@@ -148,31 +149,31 @@ OP_PDC_Import_Operator::~OP_PDC_Import_Operator()
 
 bool OP_PDC_Import_Operator::getHDKHelp(UT_String &help) const
 {
-  help  = "<html><body>";
+   help  = "<html><body>";
 
-    help  = "<h3>Maya PDC Particle Geometry</h3>";
-    help += "Maya PDC Particle Geometry will ";
+   help  = "<h3>Maya PDC Particle Geometry</h3>";
+   help += "Maya PDC Particle Geometry will ";
 
 
-    help += "<br>";
-    help += "<b>Local Variables:</b><br>";
-    help += "   N/A<br>";
-    help += "<br>";
-    help += "<b>Version:</b><br>";
-    help += "1.0.0<br>";
-    help += "<br>";
-    help += "Digital Cinema Arts: Houdini/Maya PDC Particle Geometry web page:<br>";
-    help += "<a href=\"http://www.digitalcinemaarts.com/dev/pdc/\">www.digitalcinemaarts.com/dev/pdc/</a><br>";
-    help += "<br>";
+   help += "<br>";
+   help += "<b>Local Variables:</b><br>";
+   help += "   N/A<br>";
+   help += "<br>";
+   help += "<b>Version:</b><br>";
+   help += "1.0.0<br>";
+   help += "<br>";
+   help += "Digital Cinema Arts: Houdini/Maya PDC Particle Geometry web page:<br>";
+   help += "<a href=\"http://www.digitalcinemaarts.com/dev/pdc/\">www.digitalcinemaarts.com/dev/pdc/</a><br>";
+   help += "<br>";
 
-  help += "</body></html>";
+   help += "</body></html>";
 
-  // Note: HDK developers are discouraged from embedding help
-  // in their C files and should use external help when possible.
+   // Note: HDK developers are discouraged from embedding help
+   // in their C files and should use external help when possible.
 
-  // The getHDKHelp() must return true if it is to be used in place of
-  // other forms of help (eg. custom, OTL, or Houdini help).
-  return true;
+   // The getHDKHelp() must return true if it is to be used in place of
+   // other forms of help (eg. custom, OTL, or Houdini help).
+   return true;
 }
 
 
@@ -189,7 +190,7 @@ bool OP_PDC_Import_Operator::getHDKHelp(UT_String &help) const
 ***************************************************************************** */
 void newSopOperator(OP_OperatorTable *table)
 {
-     table->addOperator(new OP_PDC_Import_Operator());
+   table->addOperator(new OP_PDC_Import_Operator());
 }
 
 
@@ -202,14 +203,13 @@ void newSopOperator(OP_OperatorTable *table)
 #define NPARMS_FOLDER_1 1
 
 static PRM_Default  switcherDef[] = {
-    PRM_Default(NPARMS_FOLDER_1,    "Setup"),
+   PRM_Default(NPARMS_FOLDER_1,    "Setup"),
 };
 
-static PRM_Name     names[] =
-{
-    PRM_Name("fname",   "File Name"),
+static PRM_Name     names[] = {
+   PRM_Name("fname",   "File Name"),
 
-    PRM_Name(0)
+   PRM_Name(0)
 };
 
 
@@ -218,28 +218,27 @@ static PRM_Default nameDefault1(0,"untitled.pdc");
 
 
 // Built the parameter template
-PRM_Template SOP_PDC_Import::myTemplateList[] =
-{
+PRM_Template SOP_PDC_Import::myTemplateList[] = {
 
-	// File name
-    PRM_Template(PRM_FILE, 1, &names[0], &nameDefault1,0),
+   // File name
+   PRM_Template(PRM_FILE, 1, &names[0], &nameDefault1,0),
 
 
-    PRM_Template()
+   PRM_Template()
 };
 
 
 // Local var enum
 enum {
-	VAR_PT,
-	VAR_NPT
+   VAR_PT,
+   VAR_NPT
 };
 
 // Local variable array
 CH_LocalVariable SOP_PDC_Import::myVariables[] = {
-    { "PT",     VAR_PT, 0 },
-    { "NPT",    VAR_NPT, 0 },
-    { 0, 0, 0 },
+   { "PT",     VAR_PT, 0 },
+   { "NPT",    VAR_NPT, 0 },
+   { 0, 0, 0 },
 };
 
 
@@ -256,15 +255,16 @@ CH_LocalVariable SOP_PDC_Import::myVariables[] = {
 ***************************************************************************** */
 float SOP_PDC_Import::getVariableValue(int index, int)
 {
-    if (myCurrPoint < 0) return 0;
+   if (myCurrPoint < 0) return 0;
 
-    switch (index)
-    {
-	   case VAR_PT:	return myCurrPoint;
-	   case VAR_NPT:	return myTotalPoints;
-    }
+   switch (index) {
+   case VAR_PT:
+      return myCurrPoint;
+   case VAR_NPT:
+      return myTotalPoints;
+   }
 
-    return 0;
+   return 0;
 }
 
 
@@ -282,7 +282,7 @@ float SOP_PDC_Import::getVariableValue(int index, int)
 
 OP_Node * SOP_PDC_Import::myConstructor(OP_Network *net, const char *name, OP_Operator *op)
 {
-    return new SOP_PDC_Import(net, name, op);
+   return new SOP_PDC_Import(net, name, op);
 }
 
 
@@ -298,9 +298,9 @@ OP_Node * SOP_PDC_Import::myConstructor(OP_Network *net, const char *name, OP_Op
 *
 ***************************************************************************** */
 SOP_PDC_Import::SOP_PDC_Import(OP_Network *net, const char *name, OP_Operator *op)
-	: SOP_Node(net, name, op)
+      : SOP_Node(net, name, op)
 {
-    OP_Node::flags().timeDep = 1;
+   OP_Node::flags().timeDep = 1;
 
    myCurrPoint = -1;			// To prevent garbage values from being returned
    myTotalPoints = 0;      // Set the NPT local variable value
@@ -332,10 +332,10 @@ SOP_PDC_Import::SOP_PDC_Import(OP_Network *net, const char *name, OP_Operator *o
    errorMsgsPDCImport[canNotCreateDetailVectorAttribute] = "Can't create detail vector attribute";
 
 
-   #ifdef SOP_MAJOR_VER
+#ifdef SOP_MAJOR_VER
    mySOPVersion = SOP_MAJOR_VER +  "." + SOP_MINOR_VER;
 //   std::cout << "Version: " << SOP_MAJOR_VER << "." << SOP_MINOR_VER << std::endl;
-   #endif
+#endif
 
 
    myPDCFile = new dca::Maya_PDC_File(0,0);
@@ -356,9 +356,10 @@ SOP_PDC_Import::SOP_PDC_Import(OP_Network *net, const char *name, OP_Operator *o
 *  Return Value :
 *
 ***************************************************************************** */
-SOP_PDC_Import::~SOP_PDC_Import() {
+SOP_PDC_Import::~SOP_PDC_Import()
+{
 
-delete(myPDCFile);
+   delete(myPDCFile);
 
 }
 
@@ -376,18 +377,18 @@ delete(myPDCFile);
 ***************************************************************************** */
 unsigned SOP_PDC_Import::disableParms()
 {
-   	unsigned changed = 0;
+   unsigned changed = 0;
 
 
-	// First turn them all on
-	for(int i=0; i <= NUM_GUI_PARMS; i++)
-		enableParm(i, 1);
+   // First turn them all on
+   for (int i=0; i <= NUM_GUI_PARMS; i++)
+      enableParm(i, 1);
 
 #ifdef DEBUG
-cout << "disableParms() - changed: " << changed << endl;
+   cout << "disableParms() - changed: " << changed << endl;
 #endif
 
-    return changed;
+   return changed;
 }
 
 
@@ -404,8 +405,8 @@ cout << "disableParms() - changed: " << changed << endl;
 ***************************************************************************** */
 OP_ERROR SOP_PDC_Import::cookMySop(OP_Context &context)
 {
-    float		 	now;
-	char GUI_str[4];
+   float		 	now;
+   char GUI_str[4];
 
    now = context.getTime();
    OP_Node::flags().timeDep = 1;
@@ -414,7 +415,7 @@ OP_ERROR SOP_PDC_Import::cookMySop(OP_Context &context)
    myTotalPoints = 0;			// Set the NPT local variable value
    myCurrPoint   = 0;			// Initialize the PT local variable
 
-	FNAME(myFileName, now);
+   FNAME(myFileName, now);
 
    disableParms();
    sprintf(GUI_str, "%s", "");
@@ -422,15 +423,18 @@ OP_ERROR SOP_PDC_Import::cookMySop(OP_Context &context)
 //   setString((UT_String)GUI_str, CH_STRING_LITERAL, ARG_PDC_IMPORT_VER, 0, now);
 
 
-	ReadPDCFile(context);
+   ReadPDCFile(context);
 
-    myCurrPoint = -1;
-    return error();
+   myCurrPoint = -1;
+   return error();
 }
 
 
 /**********************************************************************************/
 //  $Log: SOP_PDC_Import.C,v $
+//  Revision 1.17  2012-09-03 16:56:04  mstory
+//  .
+//
 //  Revision 1.16  2012-06-13 23:17:02  mstory
 //  .
 //

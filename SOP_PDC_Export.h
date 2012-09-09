@@ -14,7 +14,7 @@
 *
 *    Digital Cinema Arts (C) 2006-2012
 *
-* This work is licensed under the Creative Commons Attribution-ShareAlike 2.5 License. 
+* This work is licensed under the Creative Commons Attribution-ShareAlike 2.5 License.
 * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/2.5/ or send a letter to
 * Creative Commons, 543 Howard Street, 5th Floor, San Francisco, California, 94105, USA.
 *
@@ -41,11 +41,11 @@ enum enumExceptionSeverity {
    exceptionWarning,
    exceptionError,
    exceptionCritical
-   };
+};
 
-// An enum for all the error messages 
+// An enum for all the error messages
 enum enumErrorList {
-    
+
    export_success = 0,
    export_fail,
    cookInterrupted,
@@ -62,14 +62,14 @@ enum enumErrorList {
 };
 
 
-   UT_String errorMsgsPDCExport[NUM_ERRORS];
+UT_String errorMsgsPDCExport[NUM_ERRORS];
 
 
 /* ******************************************************************************
 *  Class Name : OP_PDC_Export_Operator()
 *
-*  Description : 
-*               
+*  Description :
+*
 *
 *  Input Arguments : None
 *
@@ -78,19 +78,19 @@ enum enumErrorList {
 ***************************************************************************** */
 class OP_PDC_Export_Operator : public OP_Operator {
 public:
-	OP_PDC_Export_Operator();
-    virtual ~OP_PDC_Export_Operator();
-    virtual bool getHDKHelp(UT_String &str) const;
+   OP_PDC_Export_Operator();
+   virtual ~OP_PDC_Export_Operator();
+   virtual bool getHDKHelp(UT_String &str) const;
 
 };
 
-  
+
 
 /* ******************************************************************************
 *  Class Name : SOP_PDC_Export_Exception()
 *
 *  Description :  Exception class for Maya PDC Export SOP
-*               
+*
 *
 *  Input Arguments : None
 *
@@ -106,33 +106,38 @@ public:
    SOP_PDC_Export_Exception(enumErrorList code, enumExceptionSeverity severity);
 //   ~SOP_PDC_Export_Exception();
 
-   void what() {  std::cout << "SOP_PDC_Export_Exception::what() - Maya PDC Export exception:  " << e_msg << endl; }
-   enumErrorList getErrorCode() { return e_code; }
-   enumExceptionSeverity getSeverity() { return severity; }
-   };
+   void what() {
+      std::cout << "SOP_PDC_Export_Exception::what() - Maya PDC Export exception:  " << e_msg << endl;
+   }
+   enumErrorList getErrorCode() {
+      return e_code;
+   }
+   enumExceptionSeverity getSeverity() {
+      return severity;
+   }
+};
 
 
 
 /* ******************************************************************************
 *  Class Name : SOP_PDC_Export()
 *
-*  Description : 
-*               
+*  Description :
+*
 *
 *  Input Arguments : None
 *
 *  Return Value : None
 *
 ***************************************************************************** */
-class SOP_PDC_Export : public SOP_Node
-{
+class SOP_PDC_Export : public SOP_Node {
 public:
    SOP_PDC_Export(OP_Network *net, const char *name, OP_Operator *op);
 
-    virtual ~SOP_PDC_Export();
+   virtual ~SOP_PDC_Export();
 
-    static PRM_Template    myTemplateList[];
-    static OP_Node         *myConstructor(OP_Network*, const char *, OP_Operator *);
+   static PRM_Template    myTemplateList[];
+   static OP_Node         *myConstructor(OP_Network*, const char *, OP_Operator *);
 
    struct attr_found_struct {
       UT_String attrName;
@@ -145,25 +150,28 @@ public:
    };
 
 protected:
-    virtual unsigned      disableParms();
-    virtual const char    *inputLabel(unsigned idx) const;
+   virtual unsigned      disableParms();
+   virtual const char    *inputLabel(unsigned idx) const;
 
-    virtual OP_ERROR cookMySop(OP_Context &context);
+   virtual OP_ERROR cookMySop(OP_Context &context);
 
 private:
 
-    // Functions for GUI widgets
-    void    FNAME(UT_String &label, float t)
-            { evalString(label, ARG_PDC_EXPORT_FNAME, 0, t); }
-    void    BEGIN_END (float *val, float t)
-            { evalFloats(ARG_PDC_EXPORT_BEGIN_END, val, t); }
-    void    ATTR(UT_String &label, float t)
-            { evalString(label, ARG_PDC_EXPORT_ATTR, 0, t); }
+   // Functions for GUI widgets
+   void    FNAME(UT_String &label, float t) {
+      evalString(label, ARG_PDC_EXPORT_FNAME, 0, t);
+   }
+   void    BEGIN_END (float *val, float t) {
+      evalFloats(ARG_PDC_EXPORT_BEGIN_END, val, t);
+   }
+   void    ATTR(UT_String &label, float t) {
+      evalString(label, ARG_PDC_EXPORT_ATTR, 0, t);
+   }
 
    // callback function
    static int writeTheFile(void *data, int index, float time, const PRM_Template *tplate );
 
-   // 
+   //
    int writePDCFile(OP_Context &context);
 
    bool                 calledFromCallback;

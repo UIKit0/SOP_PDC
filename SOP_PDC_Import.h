@@ -1,5 +1,5 @@
 /* ******************************************************************************
-* Maya PDC Particle Houdini Import SOP 
+* Maya PDC Particle Houdini Import SOP
 *
 * Description : This plugin will import Maya PDC Particle Geometry data into Houdini
 *
@@ -16,7 +16,7 @@
 *
 *    Digital Cinema Arts (C) 2006-2012
 *
-* This work is licensed under the Creative Commons Attribution-ShareAlike 2.5 License. 
+* This work is licensed under the Creative Commons Attribution-ShareAlike 2.5 License.
 * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/2.5/ or send a letter to
 * Creative Commons, 543 Howard Street, 5th Floor, San Francisco, California, 94105, USA.
 *
@@ -38,11 +38,11 @@ enum enumExceptionSeverity {
    exceptionWarning,
    exceptionError,
    exceptionCritical
-   };
+};
 
-// An enum for all the error messages 
+// An enum for all the error messages
 enum enumErrorList {
-    
+
    export_success = 0,
    export_fail,
    cookInterrupted,
@@ -72,15 +72,15 @@ enum enumErrorList {
 };
 
 
-   UT_String errorMsgsPDCImport[NUM_ERRORS];
+UT_String errorMsgsPDCImport[NUM_ERRORS];
 
 
 
 /* ******************************************************************************
 *  Class Name : OP_PDC_Import_Operator()
 *
-*  Description : 
-*               
+*  Description :
+*
 *
 *  Input Arguments : None
 *
@@ -89,9 +89,9 @@ enum enumErrorList {
 ***************************************************************************** */
 class OP_PDC_Import_Operator : public OP_Operator {
 public:
-    OP_PDC_Import_Operator();
-    virtual ~OP_PDC_Import_Operator();
-    virtual bool getHDKHelp(UT_String &str) const;
+   OP_PDC_Import_Operator();
+   virtual ~OP_PDC_Import_Operator();
+   virtual bool getHDKHelp(UT_String &str) const;
 
 };
 
@@ -101,7 +101,7 @@ public:
 *  Class Name : SOP_PDC_Import_Exception()
 *
 *  Description :  Exception class for Maya PDC Import SOP
-*               
+*
 *
 *  Input Arguments : None
 *
@@ -117,45 +117,51 @@ public:
    SOP_PDC_Import_Exception(enumErrorList code, enumExceptionSeverity severity);
 //   ~SOP_PDC_Import_Exception();
 
-   void what() {  std::cout << "SOP_PDC_Import_Exception::what() - Maya PDC Import exception:  " << e_msg << endl; }
-   enumErrorList getErrorCode() { return e_code; }
-   enumExceptionSeverity getSeverity() { return severity; }
-   };
+   void what() {
+      std::cout << "SOP_PDC_Import_Exception::what() - Maya PDC Import exception:  " << e_msg << endl;
+   }
+   enumErrorList getErrorCode() {
+      return e_code;
+   }
+   enumExceptionSeverity getSeverity() {
+      return severity;
+   }
+};
 
 
 
 /* ******************************************************************************
 *  Class Name : SOP_PDC_Import()
 *
-*  Description : 
-*               
+*  Description :
+*
 *
 *  Input Arguments : None
 *
 *  Return Value : None
 *
 ***************************************************************************** */
-class SOP_PDC_Import : public SOP_Node
-{
+class SOP_PDC_Import : public SOP_Node {
 public:
-    static OP_Node      *myConstructor(OP_Network*, const char *, OP_Operator *);
+   static OP_Node      *myConstructor(OP_Network*, const char *, OP_Operator *);
 
-    static PRM_Template      myTemplateList[];
-    static CH_LocalVariable  myVariables[];
+   static PRM_Template      myTemplateList[];
+   static CH_LocalVariable  myVariables[];
 
 protected:
-    SOP_PDC_Import(OP_Network *net, const char *name, OP_Operator *op);
-    virtual ~SOP_PDC_Import();
+   SOP_PDC_Import(OP_Network *net, const char *name, OP_Operator *op);
+   virtual ~SOP_PDC_Import();
 
-    virtual unsigned    disableParms();
-    virtual OP_ERROR    cookMySop(OP_Context &context);
-    virtual float       getVariableValue(int index, int thread);
+   virtual unsigned    disableParms();
+   virtual OP_ERROR    cookMySop(OP_Context &context);
+   virtual float       getVariableValue(int index, int thread);
 
 private:
 
 // File name
-    void    FNAME(UT_String &label, float t)
-            { evalString(label, ARG_PDC_IMPORT_FNAME, 0, t); }
+   void    FNAME(UT_String &label, float t) {
+      evalString(label, ARG_PDC_IMPORT_FNAME, 0, t);
+   }
 
 
    OP_ERROR ReadPDCFile(OP_Context &context);
@@ -167,9 +173,9 @@ private:
    UT_String  myFileName;
    UT_String  mySOPVersion;
 
-    int     myFileType;
-    int     myCurrPoint;
-    int     myTotalPoints;
+   int     myFileType;
+   int     myCurrPoint;
+   int     myTotalPoints;
 };
 
 #endif
