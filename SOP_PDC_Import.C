@@ -47,17 +47,10 @@
 #include <SOP/SOP_Node.h>
 #include <UT/UT_Interrupt.h>
 #include <UT/UT_String.h>
+#include <UT/UT_Endian.h>
 #include <CH/CH_LocalVariable.h>
 
-#if UT_MAJOR_VERSION_INT >= 12
 #include <GA/GA_AttributeRef.h>
-#else
-#include <GB/GB_AttributeDict.h>
-#if UT_MAJOR_VERSION_INT >= 10
-#include <GB/GB_AttributeRef.h>
-#endif
-#endif
-
 
 // #define DEBUG
 

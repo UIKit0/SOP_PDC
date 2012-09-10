@@ -31,20 +31,19 @@ import_src = SOP_PDC_Import.C SOP_PDC_Import.h SOP_PDC_Import_readPDCFile.C
 export_src = SOP_PDC_Export.C SOP_PDC_Export.h SOP_PDC_Export_writePDCFile.C 
 src = ${pdc_src} ${import_src} ${export_src} 
 
+TAGINFO = $(shell (echo -n "Compiled on:" `date`"\n  by:" `whoami`@`hostname`"\n$(SESI_TAGINFO)") | sesitag -m)
+CFLAGS := $(CFLAGS) ${TAGINFO} 
+CFLAGS := $(CFLAGS) -DSOP_MAJOR_VER=2 -DSOP_MINOR_VER=00
+
 all: dump_PDC SOP_PDC_Import SOP_PDC_Export 
 #all: SOP_PDC_Import SOP_PDC_Export 
 
 dump_PDC: ${pdc_src}
-	$(CXX) ${CFLAGS} -g $@.C -o $@ 
-ifeq ($(OS),Windows_NT)
-	cp $@.exe ${HOME}/bin/
-else
-	cp $@ ${HOME}/bin/
-endif
+#	$(CXX) -g ${CFLAGS} -D_GNU_SOURCE -DLINUX -DAMD64 -m64 -fPIC -DSIZEOF_VOID_P=8 -DSESI_LITTLE_ENDIAN -D_REENTRANT -D_FILE_OFFSET_BITS=64 -c -DGCC4 -DGCC3 -Wno-deprecated -I/opt/hfs${HOUDINI_VERSION}/toolkit/include -Wall -W -Wno-parentheses -Wno-sign-compare -Wno-reorder -Wno-uninitialized -Wunused -Wno-unused-parameter -O2 -o $@.o  $@.C 
+#	$(CXX) $@.o -L/usr/X11R6/lib64 -L/usr/X11R6/lib -I/opt/hfs${HOUDINI_VERSION}/dsolib -o ./$@
+	$(CXX) -g ${CFLAGS} -DDLLEXPORT= -D_GNU_SOURCE -DLINUX -DAMD64 -m64 -fPIC -DSIZEOF_VOID_P=8 -DSESI_LITTLE_ENDIAN -DENABLE_THREADS -DUSE_PTHREADS -D_REENTRANT -D_FILE_OFFSET_BITS=64 -c  -DGCC4 -DGCC3 -Wno-deprecated -I/opt/hfs${HOUDINI_VERSION}/toolkit/include -I/opt/hfs${HOUDINI_VERSION}/toolkit/include/htools -Wall -W -Wno-parentheses -Wno-sign-compare -Wno-reorder -Wno-uninitialized -Wunused -Wno-unused-parameter -O2 -DMAKING_DSO -o dump_PDC.o dump_PDC.C
+	$(CXX) dump_PDC.o -L/usr/X11R6/lib64 -L/usr/X11R6/lib -lGLU -lGL -lX11 -lXext -lXi -ldl -o ./dump_PDC
 
-TAGINFO = $(shell (echo -n "Compiled on:" `date`"\n  by:" `whoami`@`hostname`"\n$(SESI_TAGINFO)") | sesitag -m)
-CFLAGS := $(CFLAGS) ${TAGINFO} 
-CFLAGS := $(CFLAGS) -DSOP_MAJOR_VER=1 -DSOP_MINOR_VER=53
 
 Maya_PDC_File:
 	$(CXX) -g -m64 -fPIC -c -Wno-deprecated -Wall -W -Wno-parentheses -Wno-sign-compare -Wno-reorder -Wno-uninitialized -Wunused -Wno-unused-parameter -O2 -o Maya_PDC_File.o Maya_PDC_File.C
@@ -64,11 +63,11 @@ archive_src:
 	rm -fr html/
 	doxygen Doxyconfig
 	tar zcf Houdini_PDC_src_v${SRC_VER}.tar.gz \
-	Doxy_config.txt \
+	Doxyconfig\
 	Makefile \
 	html \
 	$(src)
-	cp Houdini_PDC_src_v${SRC_VER}.tar.gz src_archive
+	cp Houdini_PDC_src_v${SRC_VER}.tar.gz ../src_archive
 
 release: 
 	rm -fr html/

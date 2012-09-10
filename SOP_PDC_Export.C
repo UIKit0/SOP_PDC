@@ -31,7 +31,6 @@
 #include <ctime>
 #include <map>
 
-
 #include <UT/UT_DSOVersion.h>
 #include <UT/UT_EnvControl.h>
 #include <UT/UT_Math.h>
@@ -42,6 +41,7 @@
 #include <GU/GU_PrimPoly.h>
 #include <PRM/PRM_Include.h>
 #include <GEO/GEO_Point.h>
+#include <GA/GA_AttributeRef.h>
 #include <OP/OP_Operator.h>
 #include <OP/OP_Director.h>
 #include <OP/OP_OperatorTable.h>
@@ -50,16 +50,7 @@
 #include <UT/UT_Interrupt.h>
 #include <UT/UT_WorkArgs.h>
 #include <UT/UT_Version.h>
-
-#if UT_MAJOR_VERSION_INT >= 12
-#include <GA/GA_AttributeRef.h>
-#else
-#include <GB/GB_AttributeDict.h>
-#if UT_MAJOR_VERSION_INT >= 10
-#include <GB/GB_AttributeRef.h>
-#endif
-#endif
-
+#include <UT/UT_Endian.h>
 
 // #define DEBUG
 
@@ -92,15 +83,11 @@ SOP_PDC_Export_Exception::SOP_PDC_Export_Exception(enumErrorList code, enumExcep
 };
 
 
-
-
 //SOP_PDC_Export_Exception::~SOP_PDC_Export_Exception() {
 
 //   cout << "SOP_PDC_Export_Exception: in destructor ... " << endl;
 
 //   };
-
-
 
 
 /* ******************************************************************************
@@ -123,7 +110,6 @@ OP_PDC_Export_Operator::OP_PDC_Export_Operator()
                     0)
 {
 }
-
 
 
 /* ******************************************************************************
@@ -171,7 +157,6 @@ bool OP_PDC_Export_Operator::getHDKHelp(UT_String &help) const
 }
 
 
-
 /* ******************************************************************************
 *  Function Name :  newSopOperator()
 *
@@ -186,7 +171,6 @@ void newSopOperator(OP_OperatorTable *table)
 {
    table->addOperator(new OP_PDC_Export_Operator());
 }
-
 
 
 /* ******************************************************************************

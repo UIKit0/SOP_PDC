@@ -34,12 +34,7 @@
 ***************************************************************************** */
 int SOP_PDC_Export::writePDCFile(OP_Context &context)
 {
-#if UT_MAJOR_VERSION_INT >= 12
    float now = context.getTime();
-#else
-   float  now = context.myTime;
-#endif
-
    UT_Vector3   vec;
 
    int cur_frame, start_frame, end_frame;
@@ -105,12 +100,7 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
       for (cur_frame = start_frame; cur_frame <= end_frame; cur_frame++) {
 
          context.setFrame((long)cur_frame);
-#if UT_MAJOR_VERSION_INT >= 12
          now = context.getTime();
-#else
-         now = context.myTime;
-#endif
-
 
          // Evaluate the GUI parameters
          FNAME(myFileName, now);
@@ -133,11 +123,7 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
          if (error() < UT_ERROR_ABORT) {
 
             // Get current time and duplicate the geometry
-#if UT_MAJOR_VERSION_INT >= 12
             now = context.getTime();
-#else
-            now = context.myTime;
-#endif
             duplicateSource(0, context);
 
             if (myPDCFile->openPDCFile(myFileName.toStdString(), dca::pdcWriteFile))
@@ -168,59 +154,20 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
 //          cout << "myPointAttrDict.getSize(): " << myPointAttrDict.getSize() << endl;
 
             uint numAttrsInGeo = 0;
-#if UT_MAJOR_VERSION_INT >= 12
             GA_ROAttributeRef attrRef;
             GA_ROAttributeRef tmpAttr;
-#else
-            GB_Attribute *tmpAttr;
-#if UT_MAJOR_VERSION_INT >= 10
-            GB_AttributeRef attrRef;
-#endif
-#endif
 
             for (attrMapIter=attrMap.begin(); attrMapIter != attrMap.end(); attrMapIter++) {
 // cout << "Looking for attribute: " << (*attrMapIter).first << endl;
-#if UT_MAJOR_VERSION_INT >= 12
                tmpAttr = gdp->findPointAttribute((*attrMapIter).first.c_str());
-#else
-               tmpAttr = gdp->pointAttribs().find(UT_String(((*attrMapIter).first).c_str()));
-#endif
+
                //  Look for attributes, if found, increment attr counter
-#if UT_MAJOR_VERSION_INT >= 12
                if (tmpAttr.isValid()) {
-#else
-               if (tmpAttr != NULL) {
-#endif
+
                   attrMapFound[(const char *)(*attrMapIter).first.c_str()] = (*attrMapIter).second;
                   attr.attrName = attrMapFound[(const char *)(*attrMapIter).first.c_str()].attrName;
-#if UT_MAJOR_VERSION_INT >= 12
                   attr.attrType = tmpAttr.getStorageClass();
                   attr.attrSize = tmpAttr.getTupleSize();
-#else
-                  attr.attrType = static_cast<GB_AttribType>(tmpAttr->getType());
-
-                  switch (attr.attrType) {
-                  case GB_ATTRIB_FLOAT:
-                     attr.attrSize = (tmpAttr->getSize() / SIZEOF_FLOAT);
-                     break;
-
-                  case GB_ATTRIB_INT:
-                     attr.attrSize = (tmpAttr->getSize() / SIZEOF_INT);
-                     break;
-
-                  case GB_ATTRIB_VECTOR:
-                     attr.attrSize = (tmpAttr->getSize() / SIZEOF_FLOAT);
-                     break;
-
-                     /*                     case GB_ATTRIB_STRING:
-                                             break;
-                     */
-                  case GB_ATTRIB_MIXED:
-                     break;
-                  case GB_ATTRIB_INDEX:
-                     break;
-                  }
-#endif
                   attrMapFound[(const char *)(*attrMapIter).first.c_str()] = attr;
 
                   numAttrsInGeo++;
@@ -264,19 +211,8 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
 //         << static_cast<GB_AttribType>((*attrMapFoundIter).second.attrType) << endl;
 
 
-#if UT_MAJOR_VERSION_INT >= 12
                attrRef = gdp->findPointAttribute(((*attrMapFoundIter).first).c_str());
                if (attrRef.isValid()) {
-#elif UT_MAJOR_VERSION_INT >= 10
-               attrRef = gdp->pointAttribs().getOffset(UT_String(((*attrMapFoundIter).first).c_str()),
-                                                       static_cast<GB_AttribType>((*attrMapFoundIter).second.attrType));
-               if (attrRef.isValid()) {
-#else
-               int attrOffset = gdp->pointAttribs().getOffset(UT_String(((*attrMapFoundIter).first).c_str()),
-                                static_cast<GB_AttribType>((*attrMapFoundIter).second.attrType));
-               if (attrOffset >= 0) {
-#endif
-
 
 // cout << "SOP_PDC_Export::writePDCFile(): Found attribute: " << (*attrMapFoundIter).first << endl;
 
@@ -288,97 +224,63 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
 
                   switch ((*attrMapFoundIter).second.attrType) {
 
-#if UT_MAJOR_VERSION_INT >= 12
                   case GA_STORECLASS_INT:
                      myPDCFile->pdc_data.attrDataType = dca::pdcDataIntArray;
-#else
-                  case GB_ATTRIB_INT:
-                     myPDCFile->pdc_data.attrDataType = dca::pdcDataIntArray;
-#endif
+
                      // Write the data header for the attribute
                      if (myPDCFile->writeDataHeader())
                         throw SOP_PDC_Export_Exception(canNotWritePDCDataHeader, exceptionError);
 
-#if UT_MAJOR_VERSION_INT >= 12
                      GA_FOR_ALL_GPOINTS(gdp, ppt) {
-#else
-                     FOR_ALL_GPOINTS(gdp, ppt) {
-#endif
+
                         if (boss->opInterrupt())
                            throw SOP_PDC_Export_Exception(cookInterrupted, exceptionWarning);
 
                         // Write attribute data to disk
-#if UT_MAJOR_VERSION_INT >= 12
                         if (myPDCFile->writeDataRecord(static_cast<int>(ppt->getValue<int>(attrRef, 0))))
                            throw SOP_PDC_Export_Exception(canNotWritePDCFileData, exceptionError);
-#else
-                        if (myPDCFile->writeDataRecord(static_cast<int>(*ppt->castAttribData<int>(attrOffset))))
-                           throw SOP_PDC_Export_Exception(canNotWritePDCFileData, exceptionError);
-#endif
+
                      }
 
                      break;
 
-#if UT_MAJOR_VERSION_INT >= 12
                   case GA_STORECLASS_FLOAT:
                      if ((*attrMapFoundIter).second.attrSize == 1) {
-#else
-                  case GB_ATTRIB_FLOAT:
-#endif
+
                         myPDCFile->pdc_data.attrDataType = dca::pdcDataDoubleArray;
 
                         // Write the data header for the attribute
                         if (myPDCFile->writeDataHeader())
                            throw SOP_PDC_Export_Exception(canNotWritePDCDataHeader, exceptionError);
 
-#if UT_MAJOR_VERSION_INT >= 12
                         GA_FOR_ALL_GPOINTS(gdp, ppt) {
-#else
-                        FOR_ALL_GPOINTS(gdp, ppt) {
-#endif
+
                            if (boss->opInterrupt())
                               throw SOP_PDC_Export_Exception(cookInterrupted, exceptionWarning);
 
                            // Write attribute data to disk
-#if UT_MAJOR_VERSION_INT >= 12
                            if (myPDCFile->writeDataRecord(static_cast<double>(ppt->getValue<float>(attrRef, 0))))
                               throw SOP_PDC_Export_Exception(canNotWritePDCFileData, exceptionError);
-#else
-                           if (myPDCFile->writeDataRecord(static_cast<double>(*ppt->castAttribData<float>(attrOffset))))
-                              throw SOP_PDC_Export_Exception(canNotWritePDCFileData, exceptionError);
-#endif
+
                         }
 
-#if UT_MAJOR_VERSION_INT >= 12
-                     }
-                     else {
-#else
-                        break;
+                     } else {
 
-                     case GB_ATTRIB_VECTOR:
-#endif
                         myPDCFile->pdc_data.attrDataType = dca::pdcDataVectorArray;
 
                         // Write the data header for the attribute
                         if (myPDCFile->writeDataHeader())
                            throw SOP_PDC_Export_Exception(canNotWritePDCDataHeader, exceptionError);
 
-#if UT_MAJOR_VERSION_INT >= 12
                         GA_FOR_ALL_GPOINTS(gdp, ppt) {
-#else
-                        FOR_ALL_GPOINTS(gdp, ppt) {
-#endif
+
                            if (boss->opInterrupt())
                               throw SOP_PDC_Export_Exception(cookInterrupted, exceptionWarning);
 
-
                            struct dca::Maya_PDC_File::point_struct pt;
-#if UT_MAJOR_VERSION_INT >= 10
                            UT_Vector3 attrVec = ppt->getValue<UT_Vector3>(attrRef);
 //                           UT_Vector3 attrVec = UT_Vector3(0,0,0);
-#else
-                           UT_Vector3 attrVec = *ppt->castAttribData<UT_Vector3>(attrOffset);
-#endif
+
                            pt.pos[0] = attrVec.x();
                            pt.pos[1] = attrVec.y();
                            pt.pos[2] = attrVec.z();
@@ -387,9 +289,7 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
                            if (myPDCFile->writeDataRecord(pt))
                               throw SOP_PDC_Export_Exception(canNotWritePDCFileData, exceptionError);
                         }
-#if UT_MAJOR_VERSION_INT >= 12
                      }
-#endif
                      break;
 
                   default:
@@ -464,8 +364,7 @@ int SOP_PDC_Export::writePDCFile(OP_Context &context)
 
 
 // Exception handler
-   catch (SOP_PDC_Export_Exception e)
-   {
+   catch (SOP_PDC_Export_Exception e) {
       e.what();
 
       if (e.getSeverity() == exceptionWarning)

@@ -80,12 +80,7 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
             if (boss->opInterrupt())
                throw SOP_PDC_Import_Exception(cookInterrupted, exceptionWarning);
             // Append a point the geometry detail
-#if UT_MAJOR_VERSION_INT >= 12
             ppt = gdp->appendPointElement();
-
-#else
-            ppt = gdp->appendPoint();
-#endif
          }
 
 #ifdef DEBUG
@@ -167,19 +162,10 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
 
             else {
 
-#if UT_MAJOR_VERSION_INT >= 12
                GA_RWAttributeRef attrRef;
                GA_RWHandleI attrIntHandle;
                GA_RWHandleF attrFloatHandle;
                GA_RWHandleV3 attrVector3Handle;
-#elif UT_MAJOR_VERSION_INT >= 10
-               GB_AttributeRef attrRef;
-#else
-               int attrOffset;
-               UT_Vector3  *attrVector;
-               float       *attrFloat;
-               int         *attrInt;
-#endif
                // Add attributes based on the PDC data type
                switch (myPDCFile->pdc_data.attrDataType) {
 
@@ -190,25 +176,12 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                   std::cout << std::endl << "SOP_PDC_Import::ReadPDCFile(): pdcDataInt " << std::endl;
 #endif
 
-#if UT_MAJOR_VERSION_INT >= 12
                   attrRef = gdp->addIntTuple(GA_ATTRIB_DETAIL, myPDCFile->pdc_data.attrName.c_str(), 1);
                   if (attrRef.isValid()) {
                      attrIntHandle.bind(attrRef.getAttribute());
                      attrIntHandle.set(0, myPDCFile->pdc_data.data.int_data[0]);
                   } else
                      throw SOP_PDC_Import_Exception(canNotCreateDetailIntAttribute, exceptionError);
-#elif UT_MAJOR_VERSION_INT >= 10
-                  attrRef  = gdp->addAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(int), GB_ATTRIB_INT, 0);
-                  if (attrRef.isValid())
-                     *gdp->attribs().getElement().castAttribData<int>(attrRef) = (const int)myPDCFile->pdc_data.data.int_data[0];
-                  else
-                     throw SOP_PDC_Import_Exception(canNotCreateDetailIntAttribute, exceptionError);
-//std::cout << "SOP_PDC_Import::ReadPDCFile(): Detail data: " << " " << myPDCFile->pdc_data.data.int_data[0] << std::endl;
-#else
-                  attrOffset  = gdp->addAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(int), GB_ATTRIB_INT, 0);
-                  *gdp->attribs().castAttribData<int>(attrOffset) = (const int)myPDCFile->pdc_data.data.int_data[0];
-//std::cout << "SOP_PDC_Import::ReadPDCFile(): Detail data: " << " " << myPDCFile->pdc_data.data.int_data[0] << std::endl;
-#endif
 
                   break;
 
@@ -219,35 +192,17 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                   std::cout << std::endl << "SOP_PDC_Import::ReadPDCFile(): pdcDataIntArray" << std::endl;
 #endif
 
-#if UT_MAJOR_VERSION_INT >= 12
                   attrRef = gdp->addIntTuple(GA_ATTRIB_POINT, myPDCFile->pdc_data.attrName.c_str(), 1);
                   if (attrRef.isInvalid())
                      throw SOP_PDC_Import_Exception(canNotCreatePointIntArrayAttribute, exceptionError);
 
                   attrIntHandle.bind(attrRef.getAttribute());
 
-#elif UT_MAJOR_VERSION_INT >= 10
-                  attrRef = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(int), GB_ATTRIB_INT, 0);
-                  if (!attrRef.isValid())
-                     throw SOP_PDC_Import_Exception(canNotCreatePointIntArrayAttribute, exceptionError);
-//std::cout << "INT ARRAY ----------   " << std::endl;
-#else
-                  attrOffset = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(int), GB_ATTRIB_INT, 0);
-//std::cout << "INT ARRAY ----------  attrOffset " << attrOffset << std::endl;
-#endif
-
                   for (int i = 0; i < myPDCFile->pdc_header.numParticles; i++) {
                      if (boss->opInterrupt())
                         throw SOP_PDC_Import_Exception(cookInterrupted, exceptionWarning);
 //std::cout << "SOP_PDC_Import::ReadPDCFile(): Particle Data: " << i << " " << myPDCFile->pdc_data.data.int_data[i] << std::endl;
-#if UT_MAJOR_VERSION_INT >= 12
                      attrIntHandle.set(gdp->pointOffset(i), myPDCFile->pdc_data.data.int_data[i]);
-#elif UT_MAJOR_VERSION_INT >= 10
-                     gdp->points()[i]->setValue<int>(attrRef, (const int)myPDCFile->pdc_data.data.int_data[i]);
-#else
-                     attrInt = gdp->points()[i]->castAttribData<int>(attrOffset);
-                     *attrInt = (const int)myPDCFile->pdc_data.data.int_data[i];
-#endif
                   }
 
                   break;
@@ -259,26 +214,12 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                   std::cout << std::endl << "SOP_PDC_Import::ReadPDCFile(): pdcDataDouble" << std::endl;
 #endif
 
-#if UT_MAJOR_VERSION_INT >= 12
                   attrRef = gdp->addFloatTuple(GA_ATTRIB_DETAIL, myPDCFile->pdc_data.attrName.c_str(), 1);
                   if (attrRef.isValid()) {
                      attrFloatHandle.bind(attrRef.getAttribute());
                      attrFloatHandle.set(0, myPDCFile->pdc_data.data.double_data[0]);
                   } else
                      throw SOP_PDC_Import_Exception(canNotCreateDetailDoubleAttribute, exceptionError);
-
-#elif UT_MAJOR_VERSION_INT >= 10
-                  attrRef  = gdp->addAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(float), GB_ATTRIB_FLOAT, 0);
-                  if (attrRef.isValid())
-                     *gdp->attribs().getElement().castAttribData<float>(attrRef) =  (const float)myPDCFile->pdc_data.data.double_data[0];
-                  else
-                     throw SOP_PDC_Import_Exception(canNotCreateDetailDoubleAttribute, exceptionError);
-//std::cout << "SOP_PDC_Import::ReadPDCFile(): Detail data: " << " " << myPDCFile->pdc_data.data.double_data[0] << std::endl;
-#else
-                  attrOffset  = gdp->addAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(float), GB_ATTRIB_FLOAT, 0);
-                  *gdp->attribs().castAttribData<float>(attrOffset) =  (const float)myPDCFile->pdc_data.data.double_data[0];
-//std::cout << "SOP_PDC_Import::ReadPDCFile(): Detail data: " << " " << myPDCFile->pdc_data.data.double_data[0] << std::endl;
-#endif
 
                   break;
 
@@ -289,22 +230,11 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                   std::cout << std::endl << "SOP_PDC_Import::ReadPDCFile(): pdcDataDoubleArray" << std::endl;
 #endif
 
-#if UT_MAJOR_VERSION_INT >= 12
                   attrRef = gdp->addFloatTuple(GA_ATTRIB_POINT, myPDCFile->pdc_data.attrName.c_str(), 1);
                   if (attrRef.isInvalid())
                      throw SOP_PDC_Import_Exception(canNotCreatePointDoubleArrayAttribute, exceptionError);
 
                   attrFloatHandle.bind(attrRef.getAttribute());
-
-#elif UT_MAJOR_VERSION_INT >= 10
-                  attrRef  = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(float), GB_ATTRIB_FLOAT, 0);
-                  if (!attrRef.isValid())
-                     throw SOP_PDC_Import_Exception(canNotCreatePointDoubleArrayAttribute, exceptionError);
-//std::cout << "DOUBLE ARRAY ----------  " << std::endl;
-#else
-                  attrOffset = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(float), GB_ATTRIB_FLOAT, 0);
-//std::cout << "DOUBLE ARRAY ----------  attrOffset " << attrOffset << std::endl;
-#endif
 
                   for (int i = 0; i < myPDCFile->pdc_header.numParticles; i++) {
 
@@ -312,14 +242,7 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                         throw SOP_PDC_Import_Exception(cookInterrupted, exceptionWarning);
 //std::cout << "SOP_PDC_Import::ReadPDCFile(): Particle Data: " << i << " " << myPDCFile->pdc_data.data.double_data[i] << std::endl;
 
-#if UT_MAJOR_VERSION_INT >= 12
                      attrFloatHandle.set(gdp->pointOffset(i), myPDCFile->pdc_data.data.double_data[i]);
-#elif UT_MAJOR_VERSION_INT >= 10
-                     gdp->points()[i]->setValue<float>(attrRef, (const float)myPDCFile->pdc_data.data.double_data[i]);
-#else
-                     attrFloat = gdp->points()[i]->castAttribData<float>(attrOffset);
-                     *attrFloat = static_cast<const float>(myPDCFile->pdc_data.data.double_data[i]);
-#endif
                   }
 
                   break;
@@ -331,26 +254,12 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                   std::cout << std::endl << "SOP_PDC_Import::ReadPDCFile(): pdcDataVector" << std::endl;
 #endif
 
-#if UT_MAJOR_VERSION_INT >= 12
                   attrRef = gdp->addFloatTuple(GA_ATTRIB_DETAIL, myPDCFile->pdc_data.attrName.c_str(), 3);
                   if (attrRef.isValid()) {
                      attrVector3Handle.bind(attrRef.getAttribute());
                      attrVector3Handle.set(0, UT_Vector3(myPDCFile->pdc_data.data.pts[0].pos));
                   } else
                      throw SOP_PDC_Import_Exception(canNotCreateDetailVectorAttribute, exceptionError);
-
-#elif UT_MAJOR_VERSION_INT >= 10
-                  attrRef  = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(UT_Vector3), GB_ATTRIB_VECTOR, 0);
-                  if (attrRef.isValid())
-                     *gdp->attribs().getElement().castAttribData<UT_Vector3>(attrRef) = (const float)myPDCFile->pdc_data.data.pts[0].pos[0];
-                  else
-                     throw SOP_PDC_Import_Exception(canNotCreateDetailVectorAttribute, exceptionError);
-//std::cout << "SOP_PDC_Import::ReadPDCFile(): Detail data: " << " " << myPDCFile->pdc_data.data.pts[0].pos[0] << std::endl;
-#else
-                  attrOffset  = gdp->addAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(UT_Vector3), GB_ATTRIB_VECTOR, 0);
-                  *gdp->attribs().castAttribData<UT_Vector3>(attrOffset) = (const float)myPDCFile->pdc_data.data.pts[0].pos[0];
-//std::cout << "SOP_PDC_Import::ReadPDCFile(): Detail data: " << " " << myPDCFile->pdc_data.data.pts[0].pos[0] << std::endl;
-#endif
 
                   break;
 
@@ -361,22 +270,11 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                   std::cout << std::endl << "SOP_PDC_Import::ReadPDCFile(): pdcDataVectorArray" << std::endl;
 #endif
 
-#if UT_MAJOR_VERSION_INT >= 12
                   attrRef = gdp->addFloatTuple(GA_ATTRIB_POINT, myPDCFile->pdc_data.attrName.c_str(), 3);
                   if (attrRef.isInvalid())
                      throw SOP_PDC_Import_Exception(canNotCreatePointVectorArrayAttribute, exceptionError);
 
                   attrVector3Handle.bind(attrRef.getAttribute());
-
-#elif UT_MAJOR_VERSION_INT >= 10
-                  attrRef = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(float) * 3, GB_ATTRIB_VECTOR, 0);
-                  if (!attrRef.isValid())
-                     throw SOP_PDC_Import_Exception(canNotCreatePointVectorArrayAttribute, exceptionError);
-//std::cout << "VECTOR ARRAY ----------   " << std::endl;
-#else
-                  attrOffset = gdp->addPointAttrib((const char *)myPDCFile->pdc_data.attrName.c_str(), sizeof(float) * 3, GB_ATTRIB_VECTOR, 0);
-//std::cout << "VECTOR ARRAY ----------  attrOffset " << attrOffset << std::endl;
-#endif
 
                   for (int i = 0; i < myPDCFile->pdc_header.numParticles; i++) {
 
@@ -384,18 +282,7 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
                         throw SOP_PDC_Import_Exception(cookInterrupted, exceptionWarning);
 
 //std::cout << "SOP_PDC_Import::ReadPDCFile(): Particle Data: " << i << " " << myPDCFile->pdc_data.data.pts[i].pos[0] << " " << myPDCFile->pdc_data.data.pts[i].pos[1] << " "  << myPDCFile->pdc_data.data.pts[i].pos[2] << std::endl;
-#if UT_MAJOR_VERSION_INT >= 12
                      attrVector3Handle.set(gdp->pointOffset(i), UT_Vector3(myPDCFile->pdc_data.data.pts[i].pos));
-#elif UT_MAJOR_VERSION_INT >= 10
-//                        *gdp->attribs().castAttribData<UT_Vector3>(attrRef) =  (const float)myPDCFile->pdc_data.data.pts[i].pos[0];
-                     gdp->points()[i]->setValue<UT_Vector3>(attrRef, (const UT_Vector3)myPDCFile->pdc_data.data.pts[i].pos);
-#else
-                     attrVector = gdp->points()[i]->castAttribData<UT_Vector3>(attrOffset);
-                     attrVector->assign((const float)myPDCFile->pdc_data.data.pts[i].pos[0],
-                                        (const float)myPDCFile->pdc_data.data.pts[i].pos[1],
-                                        (const float)myPDCFile->pdc_data.data.pts[i].pos[2]);
-#endif
-
                   }
 
                   break;
@@ -419,9 +306,7 @@ OP_ERROR SOP_PDC_Import::ReadPDCFile(OP_Context &context)
 
             } // else (not position attribute)
 
-
          } // for each attribute ...
-
 
          // Close the PDC file
          if (myPDCFile->closePDCFile(dca::pdcReadFile))

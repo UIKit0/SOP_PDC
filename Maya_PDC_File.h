@@ -104,9 +104,10 @@ public:
    int openPDCFile(std::string myFileName, int mode);
    int closePDCFile(int mode);
 
+   int dumpAllData();
+
    int readHeader();
    int readData(int i);
-   int readAllData();
    int readDataHeader();
    int readDataRecord();
 

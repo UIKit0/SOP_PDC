@@ -27,6 +27,7 @@
 #ifndef __Maya_PDC_File_C__
 #define __Maya_PDC_File_C__
 
+#include <UT/UT_Endian.h>
 #include "Maya_PDC_File.h"
 
 // #define DEBUG
@@ -154,12 +155,12 @@ inline int Maya_PDC_File::readHeader()
       PDCInFileStream.read((char *)&pdc_header.numParticles, sizeof(int));
       PDCInFileStream.read((char *)&pdc_header.numAttributes, sizeof(int));
 
-      pdc_header.formatVersion = convert32(&pdc_header.formatVersion);
-      pdc_header.byteOrder = convert32(&pdc_header.byteOrder);
-      pdc_header.extra1 = convert32(&pdc_header.extra1);
-      pdc_header.extra2 = convert32(&pdc_header.extra2);
-      pdc_header.numParticles = convert32(&pdc_header.numParticles);
-      pdc_header.numAttributes = convert32(&pdc_header.numAttributes);
+      UTswap_int32(pdc_header.formatVersion, pdc_header.formatVersion);
+      UTswap_int32(pdc_header.byteOrder, pdc_header.byteOrder);
+      UTswap_int32(pdc_header.extra1, pdc_header.extra1);
+      UTswap_int32(pdc_header.extra2, pdc_header.extra2);
+      UTswap_int32(pdc_header.numParticles, pdc_header.numParticles);
+      UTswap_int32(pdc_header.numAttributes, pdc_header.numAttributes);
 
 #ifdef DEBUG
       std::cout << "Maya_PDC_File::readHeader(): pdc_header.format = " << pdc_header.format << std::endl;
@@ -206,7 +207,7 @@ inline int Maya_PDC_File::readData(int i)
 
 
 /* ******************************************************************************
-/// Function Name : readAllData()
+/// Function Name : dumpAllData()
 *
 /// Description :
 ///
@@ -216,10 +217,10 @@ inline int Maya_PDC_File::readData(int i)
 /// Return Value : int
 *
 ***************************************************************************** */
-int Maya_PDC_File::readAllData()
+int Maya_PDC_File::dumpAllData()
 {
 
-   std::cout << "Maya_PDC_File::readAllData()" << std::endl;
+   std::cout << "Maya_PDC_File::dumpAllData()" << std::endl;
 
    char temp_name[pdcAttrNameLengthMax];
    int data_type;
@@ -231,20 +232,19 @@ int Maya_PDC_File::readAllData()
 
       for (int num_attrs = 0; num_attrs < pdc_header.numAttributes; num_attrs++) {
 
-         std::cout << "Maya_PDC_File::readAllData(): attribute number = " << num_attrs << std::endl;
+         std::cout << "Maya_PDC_File::dumpAllData(): attribute number = " << num_attrs << std::endl;
 
          PDCInFileStream.read((char *)&pdc_data.attrNameLength, sizeof(int));
-         pdc_data.attrNameLength = convert32(&pdc_data.attrNameLength);
+         UTswap_int32(pdc_data.attrNameLength, pdc_data.attrNameLength);
 
-         std::cout << "Maya_PDC_File::readAllData(): pdc_data.attrNameLength = " << pdc_data.attrNameLength << std::endl;
+         std::cout << "Maya_PDC_File::dumpAllData(): pdc_data.attrNameLength = " << pdc_data.attrNameLength << std::endl;
 
          // If attribute name is not too long, else throw exception
          if (pdc_data.attrNameLength < pdcAttrNameLengthMax) {
             PDCInFileStream.read((char *)temp_name, pdc_data.attrNameLength);
             pdc_data.attrName.assign(temp_name, pdc_data.attrNameLength);
          }
-         std::cout << "Maya_PDC_File::readAllData(): pdc_data.attrName = " << pdc_data.attrName << std::endl;
-
+         std::cout << "Maya_PDC_File::dumpAllData(): pdc_data.attrName = " << pdc_data.attrName << std::endl;
 
 
 
@@ -260,60 +260,60 @@ int Maya_PDC_File::readAllData()
          }
 
 
-
-
          PDCInFileStream.read((char *)&data_type, sizeof(int));
+         UTswap_int32(data_type, data_type);
 
-         data_type = convert32(&data_type);
-
-         std::cout << "Maya_PDC_File::readAllData(): data_type = " << data_type << std::endl;
+         std::cout << "Maya_PDC_File::dumpAllData(): data_type = " << data_type << std::endl;
 
 
          switch (data_type) {
 
          case pdcDataInt:
             PDCInFileStream.read((char *)&int_data, sizeof(int));
-            int_data = convert32(&int_data);
+            UTswap_int32(int_data, int_data);
             pdc_data.data.int_data.push_back(int_data);
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataInt - size: " << pdc_data.data.int_data.size() << std::flush << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataInt - size: " << pdc_data.data.int_data.size() << std::flush << std::endl;
             pdc_data.data.int_data.clear();
             break;
 
          case pdcDataIntArray:
             for (num_particles = 0; num_particles < pdc_header.numParticles; num_particles++) {
                PDCInFileStream.read((char *)&int_data, sizeof(int));
-               int_data = convert32(&int_data);
+               UTswap_int32(int_data, int_data);
                pdc_data.data.int_data.push_back(int_data);
             }
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataIntArray - num_particles: " << num_particles << std::flush << std::endl;
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataIntArray - size: " << pdc_data.data.int_data.size() << std::flush  << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataIntArray - num_particles: " << num_particles << std::flush << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataIntArray - size: " << pdc_data.data.int_data.size() << std::flush  << std::endl;
             pdc_data.data.int_data.clear();
             break;
 
          case pdcDataDouble:
             PDCInFileStream.read((char *)&double_data, sizeof(double));
+//            UTswapBytes(&double_data, &double_data, 8);
             swapdouble(&double_data);
             pdc_data.data.double_data.push_back(double_data);
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataDouble - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataDouble - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
             pdc_data.data.double_data.clear();
             break;
 
          case pdcDataDoubleArray:
             for (num_particles = 0; num_particles < pdc_header.numParticles; num_particles++) {
                PDCInFileStream.read((char *)&double_data, sizeof(double));
+//               UTswapBytes(&double_data, &double_data, 8);
                swapdouble(&double_data);
                pdc_data.data.double_data.push_back(double_data);
             }
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataDoubleArray - num_particles: " << num_particles << std::flush << std::endl;
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataDoubleArray - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataDoubleArray - num_particles: " << num_particles << std::flush << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataDoubleArray - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
             pdc_data.data.double_data.clear();
             break;
 
          case pdcDataVector:
             PDCInFileStream.read((char *)&double_data, sizeof(double));
+//            UTswapBytes(&double_data, &double_data, 8);
             swapdouble(&double_data);
             pdc_data.data.double_data.push_back(double_data);
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataVector - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataVector - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
             pdc_data.data.double_data.clear();
             break;
 
@@ -321,19 +321,20 @@ int Maya_PDC_File::readAllData()
             for (num_particles = 0; num_particles < pdc_header.numParticles; num_particles++) {
                for (unsigned int j = 0; j < 3; j++) {
                   PDCInFileStream.read((char *)&double_data, sizeof(double));
+//                  UTswapBytes(&double_data, &double_data, 8);
                   swapdouble(&double_data);
                   pdc_data.data.double_data.push_back(double_data);
                }
             }
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataVectorArray - num_particles: " << num_particles << std::flush << std::endl;
-            std::cout << "Maya_PDC_File::readAllData(): pdcDataVectorArray - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataVectorArray - num_particles: " << num_particles << std::flush << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): pdcDataVectorArray - size: " << pdc_data.data.double_data.size() << std::flush  << std::endl;
             pdc_data.data.double_data.clear();
             break;
 
          default:
             // THROW EXCEPTION
 
-            std::cout << "Maya_PDC_File::readAllData(): data_type = " << data_type << " INVALID DATA TYPE" << std::endl << std::endl;
+            std::cout << "Maya_PDC_File::dumpAllData(): data_type = " << data_type << " INVALID DATA TYPE" << std::endl << std::endl;
             PDCInFileStream.close();
             return 1;
 
@@ -346,7 +347,7 @@ int Maya_PDC_File::readAllData()
    }
 
    catch (std::ios_base::failure& e ) {
-      std::cerr << "Maya_PDC_File::readAllData(): EXCEPTION: " << e.what() << std::endl;
+      std::cerr << "Maya_PDC_File::dumpAllData(): EXCEPTION: " << e.what() << std::endl;
       PDCInFileStream.clear();
       PDCInFileStream.close();
       return 1;
@@ -382,12 +383,13 @@ inline int Maya_PDC_File::writeHeader()
    std::cout << "Maya_PDC_File::writeHeader(): pdc_header.numAttributes = " << pdc_header.numAttributes << std::endl;
 #endif
 
-   pdc_header.formatVersion = convert32(&pdc_header.formatVersion);
-   pdc_header.byteOrder = convert32(&pdc_header.byteOrder);
-   pdc_header.extra1 = convert32(&pdc_header.extra1);
-   pdc_header.extra2 = convert32(&pdc_header.extra2);
-   pdc_header.numParticles = convert32(&pdc_header.numParticles);
-   pdc_header.numAttributes = convert32(&pdc_header.numAttributes);
+   UTswap_int32(pdc_header.formatVersion, pdc_header.formatVersion);
+   UTswap_int32(pdc_header.byteOrder, pdc_header.byteOrder);
+   UTswap_int32(pdc_header.extra1, pdc_header.extra1);
+   UTswap_int32(pdc_header.extra2, pdc_header.extra2);
+   UTswap_int32(pdc_header.numParticles, pdc_header.numParticles);
+   UTswap_int32(pdc_header.numAttributes, pdc_header.numAttributes);
+
 
    try {
       PDCOutFileStream.write((const char *)&pdc_header.format, 4);
@@ -423,8 +425,10 @@ inline int Maya_PDC_File::writeHeader()
 inline int Maya_PDC_File::writeDataHeader()
 {
 
-   int nameLength = convert32(&pdc_data.attrNameLength);
-   int data_type = convert32(&pdc_data.attrDataType);
+   int nameLength;
+   int data_type;
+   UTswap_int32(pdc_data.attrNameLength, nameLength);
+   UTswap_int32(pdc_data.attrDataType, data_type);
 
 #ifdef DEBUG
    std::cout << "Maya_PDC_File::writeDataHeader(): nameLength = " << pdc_data.attrNameLength << std::endl;
@@ -473,7 +477,7 @@ inline int Maya_PDC_File::readDataHeader()
 
    try {
       PDCInFileStream.read((char *)&pdc_data.attrNameLength, sizeof(int));
-      pdc_data.attrNameLength = convert32(&pdc_data.attrNameLength);
+      UTswap_int32(pdc_data.attrNameLength, pdc_data.attrNameLength);
 
 #ifdef DEBUG
       std::cout << "Maya_PDC_File::readDataHeader(): pdc_data.attrNameLength = " << pdc_data.attrNameLength << std::endl;
@@ -506,7 +510,7 @@ inline int Maya_PDC_File::readDataHeader()
 
       // Read the data tpe for this attribute
       PDCInFileStream.read((char *)&data_type, sizeof(int));
-      data_type = convert32(&data_type);
+      UTswap_int32(data_type, data_type);
 
 #ifdef DEBUG
       std::cout << "Maya_PDC_File::readDataHeader(): data_type = " << data_type << std::endl;
@@ -628,7 +632,7 @@ inline int Maya_PDC_File::readDataRecord()
          pdc_data.data.int_data.clear();
 
          PDCInFileStream.read((char *)&int_data, sizeof(int));
-         int_data = convert32(&int_data);
+         UTswap_int32(int_data, int_data);
          pdc_data.data.int_data.push_back(int_data);
 
 #ifdef DEBUG
@@ -642,7 +646,7 @@ inline int Maya_PDC_File::readDataRecord()
          pdc_data.data.int_data.clear();
          for (int particle_num = 0; particle_num < pdc_header.numParticles; particle_num++) {
             PDCInFileStream.read((char *)&int_data, sizeof(int));
-            int_data = convert32(&int_data);
+            UTswap_int32(int_data, int_data);
             pdc_data.data.int_data.push_back(int_data);
          }
 
@@ -657,6 +661,8 @@ inline int Maya_PDC_File::readDataRecord()
          pdc_data.data.double_data.clear();
          PDCInFileStream.read((char *)&double_data, sizeof(double));
          swapdouble(&double_data);
+//         UTswapBytes(&double_data, &double_data, 8);
+
          pdc_data.data.double_data.push_back(double_data);
 
 #ifdef DEBUG
@@ -671,6 +677,7 @@ inline int Maya_PDC_File::readDataRecord()
          for (int particle_num = 0; particle_num < pdc_header.numParticles; particle_num++) {
             PDCInFileStream.read((char *)&double_data, sizeof(double));
             swapdouble(&double_data);
+//            UTswapBytes(&double_data, &double_data, 8);
             pdc_data.data.double_data.push_back(double_data);
          }
 
@@ -685,6 +692,9 @@ inline int Maya_PDC_File::readDataRecord()
          pdc_data.data.double_data.clear();
 
          PDCInFileStream.read((char *)&vec_data, sizeof(vec_struct_data));
+//         UTswapBytes(&vec_data.vec.x, &vec_data.vec.x, 8);
+//         UTswapBytes(&vec_data.vec.x, &vec_data.vec.y, 8);
+//         UTswapBytes(&vec_data.vec.x, &vec_data.vec.z, 8);
          swapdouble(&vec_data.vec.x);
          swapdouble(&vec_data.vec.y);
          swapdouble(&vec_data.vec.z);
@@ -705,6 +715,9 @@ inline int Maya_PDC_File::readDataRecord()
 
          for (int particle_num = 0; particle_num < pdc_header.numParticles; particle_num++) {
             PDCInFileStream.read((char *)&vec_data, sizeof(vec_struct_data));
+//            UTswapBytes(&vec_data.vec.x, &vec_data.vec.x, 8);
+//            UTswapBytes(&vec_data.vec.x, &vec_data.vec.y, 8);
+//            UTswapBytes(&vec_data.vec.x, &vec_data.vec.z, 8);
             swapdouble(&vec_data.vec.x);
             swapdouble(&vec_data.vec.y);
             swapdouble(&vec_data.vec.z);
@@ -764,8 +777,9 @@ inline int Maya_PDC_File::writeDataRecord(int data)
    std::cout << "Maya_PDC_File::writeDataRecord(int data): " << std::endl;
 #endif
 
+   int int_data;
    try {
-      int int_data = convert32(&data);
+      UTswap_int32(data, int_data);
       PDCOutFileStream.write((char *)&int_data, sizeof(int));
    }
 
@@ -802,6 +816,7 @@ inline int Maya_PDC_File::writeDataRecord(double data)
 
    try {
       double dbl_data = data;
+//      UTswapBytes(&dbl_data, &dbl_data, 8);
       swapdouble(&dbl_data);
       PDCOutFileStream.write((char *)&dbl_data, sizeof(double));
    }
@@ -852,7 +867,9 @@ inline int Maya_PDC_File::writeDataRecord(point_struct data)
       swapdouble(&myData.x);
       swapdouble(&myData.y);
       swapdouble(&myData.z);
-
+//      UTswapBytes(&myData.x, &myData.x, 8);
+//      UTswapBytes(&myData.y, &myData.y, 8);
+//      UTswapBytes(&myData.z, &myData.z, 8);
 
       PDCOutFileStream.write((char *)&myData, sizeof(myData));
    }

@@ -109,20 +109,20 @@ int32 convert32(const int32 *data)
 
 
 
-static void swapfloat(float *f)
-{
-   float tmp;
-   char *src, *dst;
-
-   src = (char*)f;
-   dst = (char*)&tmp;
-   dst[0] = src[3];
-   dst[1] = src[2];
-   dst[2] = src[1];
-   dst[3] = src[0];
-   *f = tmp;
-}
-
+//static void swapfloat(float *f)
+//{
+//   float tmp;
+//   char *src, *dst;
+//
+//   src = (char*)f;
+//   dst = (char*)&tmp;
+//   dst[0] = src[3];
+//   dst[1] = src[2];
+//   dst[2] = src[1];
+//   dst[3] = src[0];
+//   *f = tmp;
+//}
+//
 
 static void swapdouble(double *d)
 {

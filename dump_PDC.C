@@ -33,6 +33,7 @@
 #include "Maya_PDC_File.h"
 #include "Maya_PDC_File.C"
 
+
 using namespace std;
 using namespace dca;
 
@@ -43,8 +44,6 @@ int main(int argc, char *argv[])
 {
 
    dca::Maya_PDC_File *myPDCFile;
-   unsigned int current_frame;
-   unsigned int current_point;
 
    std::cout.precision(4);
 
@@ -68,7 +67,7 @@ int main(int argc, char *argv[])
       std::cout << "Maya_PDC_File::readHeader(): pdc_header.numAttributes = " << myPDCFile->pdc_header.numAttributes << std::endl;
       std::cout << endl;
 
-      if (!myPDCFile->readAllData())
+      if (!myPDCFile->dumpAllData())
          myPDCFile->closePDCFile(dca::pdcReadFile);
 
       delete(myPDCFile);
